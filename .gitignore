@@ -6,5 +6,7 @@ zig-out/
 /build-*/
 /docgen_tmp/
 zig-cache/
+.venv/
+.mypy_cache/
 
 game.wasm

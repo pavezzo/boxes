@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Position</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #positions {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>WebSocket Position</h1>
+
+    <p id="status">Connecting to WebSocket...</p>
+
+    <div id="positions"></div>
+
+    <script>
+        let ws;
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.hostname}:5001`);
+
+            ws.onopen = () => {
+                document.getElementById('status').innerText = "Connected to WebSocket.";
+            };
+
+            ws.onclose = () => {
+                document.getElementById('status').innerText = "Disconnected from WebSocket.";
+            };
+
+            ws.onerror = (error) => {
+                console.error("WebSocket Error: ", error);
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                updatePositions(data);
+            };
+        }
+
+        function updatePositions(data) {
+            const positionsDiv = document.getElementById('positions');
+            positionsDiv.innerHTML = '';  // Clear previous data
+            positions = data['positions']
+            console.log(data)
+            for (const clientId in positions) {
+                const position = positions[clientId];
+                const positionText = document.createElement('div');
+                positionText.innerHTML = `${clientId}: x = ${position.x.toFixed(6)}, y = ${position.y.toFixed(6)}`;
+                positionsDiv.appendChild(positionText);
+            }
+            const my_id_text = document.createElement('div');
+            my_id_text.innerHTML = `My id = ${data["my_id"]}`;
+            positionsDiv.appendChild(my_id_text);
+
+        }
+
+        connectWebSocket(); // Initiate WebSocket connection when the page loads
+
+        // Send position updates to the server every second
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const movement = {
+                    dx: Math.random() * 0.1 - 0.05,  // Random movement between -0.05 and 0.05
+                    dy: Math.random() * 0.1 - 0.05   // Random movement between -0.05 and 0.05
+                };
+                ws.send(JSON.stringify(movement));
+            }
+        }, 50);
+    </script>
+
+</body>
+
+</html>

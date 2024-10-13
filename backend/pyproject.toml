@@ -1,0 +1,28 @@
+[tool.isort]
+profile = 'black'
+line_length = 79
+skip = [".venv"]
+
+[tool.mypy]
+exclude = [".venv"]
+
+[[tool.mypy.overrides]]
+module = []
+ignore_missing_imports = true
+
+[tool.pylint]
+spelling-dict = "en_US"
+ignore = ".venv"
+
+[tool.pylint."messages control"]
+disable = [
+    "missing-function-docstring",
+    "missing-class-docstring",
+    "missing-module-docstring",
+    "fixme",
+]
+
+[tool.black]
+line-length = 79
+target-version = ['py39']
+preview = "true"
